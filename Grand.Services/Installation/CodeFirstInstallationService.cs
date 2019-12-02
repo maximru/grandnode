@@ -57,12 +57,7 @@ namespace Grand.Services.Installation
         private readonly IRepository<Bid> _bidRepository;
         private readonly IRepository<Address> _addressRepository;
         private readonly IRepository<Affiliate> _affiliateRepository;
-        private readonly IRepository<BlogComment> _blogcommentRepository;
-        private readonly IRepository<BlogPost> _blogpostRepository;
-        private readonly IRepository<Campaign> _campaignRepository;
         private readonly IRepository<CampaignHistory> _campaignHistoryRepository;
-        private readonly IRepository<Download> _downloadRepository;
-        private readonly IRepository<GiftCard> _giftcardRepository;
         private readonly IRepository<Order> _orderRepository;
         private readonly IRepository<OrderNote> _orderNoteRepository;
         private readonly IRepository<ReturnRequest> _returnrequestRepository;
@@ -93,16 +88,12 @@ namespace Grand.Services.Installation
         private readonly IRepository<Product> _productRepository;
         private readonly IRepository<ProductReservation> _productReservationRepository;
         private readonly IRepository<ProductAlsoPurchased> _productalsopurchasedRepository;
-        private readonly IRepository<Picture> _pictureRepository;
         private readonly IRepository<UrlRecord> _urlRecordRepository;
         private readonly IRepository<EmailAccount> _emailAccountRepository;
         private readonly IRepository<MessageTemplate> _messageTemplateRepository;
         private readonly IRepository<ForumGroup> _forumGroupRepository;
         private readonly IRepository<Forum> _forumRepository;
-        private readonly IRepository<ForumPost> _forumpostRepository;
-        private readonly IRepository<ForumTopic> _forumtopicRepository;
         private readonly IRepository<ForumPostVote> _forumPostVote;
-        private readonly IRepository<ForumSubscription> _forumsubscriptionRepository;
         private readonly IRepository<Country> _countryRepository;
         private readonly IRepository<StateProvince> _stateProvinceRepository;
         private readonly IRepository<Discount> _discountRepository;
@@ -113,11 +104,9 @@ namespace Grand.Services.Installation
         private readonly IRepository<NewsItem> _newsItemRepository;
         private readonly IRepository<NewsLetterSubscription> _newslettersubscriptionRepository;
         private readonly IRepository<Poll> _pollRepository;
-        private readonly IRepository<PrivateMessage> _privatemessageRepository;
         private readonly IRepository<ShippingMethod> _shippingMethodRepository;
         private readonly IRepository<DeliveryDate> _deliveryDateRepository;
         private readonly IRepository<ActivityLogType> _activityLogTypeRepository;
-        private readonly IRepository<ActivityLog> _activityLogRepository;
         private readonly IRepository<ProductTag> _productTagRepository;
         private readonly IRepository<ProductReview> _productReviewRepository;
         private readonly IRepository<ProductTemplate> _productTemplateRepository;
@@ -125,7 +114,6 @@ namespace Grand.Services.Installation
         private readonly IRepository<ManufacturerTemplate> _manufacturerTemplateRepository;
         private readonly IRepository<TopicTemplate> _topicTemplateRepository;
         private readonly IRepository<ScheduleTask> _scheduleTaskRepository;
-        private readonly IRepository<QueuedEmail> _queuedemailRepository;
         private readonly IRepository<RewardPointsHistory> _rewardpointshistoryRepository;
         private readonly IRepository<SearchTerm> _searchtermRepository;
         private readonly IRepository<Setting> _settingRepository;
@@ -140,17 +128,14 @@ namespace Grand.Services.Installation
         private readonly IRepository<CustomerAction> _customerAction;
         private readonly IRepository<CustomerActionType> _customerActionType;
         private readonly IRepository<CustomerActionHistory> _customerActionHistory;
-        private readonly IRepository<Banner> _banner;
         private readonly IRepository<PopupArchive> _popupArchive;
-        private readonly IRepository<CustomerReminder> _customerReminder;
         private readonly IRepository<CustomerReminderHistory> _customerReminderHistoryRepository;
         private readonly IRepository<RecentlyViewedProduct> _recentlyViewedProductRepository;
         private readonly IRepository<KnowledgebaseArticle> _knowledgebaseArticleRepository;
         private readonly IRepository<KnowledgebaseCategory> _knowledgebaseCategoryRepository;
-        private readonly ICustomerActionService _customerActionService;
         private readonly IGenericAttributeService _genericAttributeService;
         private readonly IWebHelper _webHelper;
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IWebHostEnvironment _hostingEnvironment;
         private readonly IServiceProvider _serviceProvider;
 
         #endregion
@@ -163,14 +148,9 @@ namespace Grand.Services.Installation
             _bidRepository = serviceProvider.GetRequiredService<IRepository<Bid>>();
             _addressRepository = serviceProvider.GetRequiredService<IRepository<Address>>();
             _affiliateRepository = serviceProvider.GetRequiredService<IRepository<Affiliate>>();
-            _blogcommentRepository = serviceProvider.GetRequiredService<IRepository<BlogComment>>();
-            _blogpostRepository = serviceProvider.GetRequiredService<IRepository<BlogPost>>();
-            _campaignRepository = serviceProvider.GetRequiredService<IRepository<Campaign>>();
             _campaignHistoryRepository = serviceProvider.GetRequiredService<IRepository<CampaignHistory>>();
-            _downloadRepository = serviceProvider.GetRequiredService<IRepository<Download>>();
             _orderRepository = serviceProvider.GetRequiredService<IRepository<Order>>();
             _orderNoteRepository = serviceProvider.GetRequiredService<IRepository<OrderNote>>();
-            _giftcardRepository = serviceProvider.GetRequiredService<IRepository<GiftCard>>();
             _storeRepository = serviceProvider.GetRequiredService<IRepository<Store>>();
             _measureDimensionRepository = serviceProvider.GetRequiredService<IRepository<MeasureDimension>>();
             _measureWeightRepository = serviceProvider.GetRequiredService<IRepository<MeasureWeight>>();
@@ -196,16 +176,12 @@ namespace Grand.Services.Installation
             _manufacturerRepository = serviceProvider.GetRequiredService<IRepository<Manufacturer>>();
             _productRepository = serviceProvider.GetRequiredService<IRepository<Product>>();
             _productReservationRepository = serviceProvider.GetRequiredService<IRepository<ProductReservation>>();
-            _pictureRepository = serviceProvider.GetRequiredService<IRepository<Picture>>();
             _productalsopurchasedRepository = serviceProvider.GetRequiredService<IRepository<ProductAlsoPurchased>>();
             _urlRecordRepository = serviceProvider.GetRequiredService<IRepository<UrlRecord>>();
             _emailAccountRepository = serviceProvider.GetRequiredService<IRepository<EmailAccount>>();
             _messageTemplateRepository = serviceProvider.GetRequiredService<IRepository<MessageTemplate>>();
             _forumGroupRepository = serviceProvider.GetRequiredService<IRepository<ForumGroup>>();
             _forumRepository = serviceProvider.GetRequiredService<IRepository<Forum>>();
-            _forumpostRepository = serviceProvider.GetRequiredService<IRepository<ForumPost>>();
-            _forumtopicRepository = serviceProvider.GetRequiredService<IRepository<ForumTopic>>();
-            _forumsubscriptionRepository = serviceProvider.GetRequiredService<IRepository<ForumSubscription>>();
             _forumPostVote = serviceProvider.GetRequiredService<IRepository<ForumPostVote>>();
             _countryRepository = serviceProvider.GetRequiredService<IRepository<Country>>();
             _stateProvinceRepository = serviceProvider.GetRequiredService<IRepository<StateProvince>>();
@@ -217,11 +193,9 @@ namespace Grand.Services.Installation
             _newsItemRepository = serviceProvider.GetRequiredService<IRepository<NewsItem>>();
             _newslettersubscriptionRepository = serviceProvider.GetRequiredService<IRepository<NewsLetterSubscription>>();
             _pollRepository = serviceProvider.GetRequiredService<IRepository<Poll>>();
-            _privatemessageRepository = serviceProvider.GetRequiredService<IRepository<PrivateMessage>>();
             _shippingMethodRepository = serviceProvider.GetRequiredService<IRepository<ShippingMethod>>();
             _deliveryDateRepository = serviceProvider.GetRequiredService<IRepository<DeliveryDate>>();
             _activityLogTypeRepository = serviceProvider.GetRequiredService<IRepository<ActivityLogType>>();
-            _activityLogRepository = serviceProvider.GetRequiredService<IRepository<ActivityLog>>();
             _productTagRepository = serviceProvider.GetRequiredService<IRepository<ProductTag>>();
             _productTemplateRepository = serviceProvider.GetRequiredService<IRepository<ProductTemplate>>();
             _recentlyViewedProductRepository = serviceProvider.GetRequiredService<IRepository<RecentlyViewedProduct>>();
@@ -229,7 +203,6 @@ namespace Grand.Services.Installation
             _manufacturerTemplateRepository = serviceProvider.GetRequiredService<IRepository<ManufacturerTemplate>>();
             _topicTemplateRepository = serviceProvider.GetRequiredService<IRepository<TopicTemplate>>();
             _scheduleTaskRepository = serviceProvider.GetRequiredService<IRepository<ScheduleTask>>();
-            _queuedemailRepository = serviceProvider.GetRequiredService<IRepository<QueuedEmail>>();
             _returnrequestRepository = serviceProvider.GetRequiredService<IRepository<ReturnRequest>>();
             _rewardpointshistoryRepository = serviceProvider.GetRequiredService<IRepository<RewardPointsHistory>>();
             _searchtermRepository = serviceProvider.GetRequiredService<IRepository<SearchTerm>>();
@@ -247,16 +220,13 @@ namespace Grand.Services.Installation
             _customerAction = serviceProvider.GetRequiredService<IRepository<CustomerAction>>();
             _customerActionType = serviceProvider.GetRequiredService<IRepository<CustomerActionType>>();
             _customerActionHistory = serviceProvider.GetRequiredService<IRepository<CustomerActionHistory>>();
-            _customerReminder = serviceProvider.GetRequiredService<IRepository<CustomerReminder>>();
             _customerReminderHistoryRepository = serviceProvider.GetRequiredService<IRepository<CustomerReminderHistory>>();
             _knowledgebaseArticleRepository = serviceProvider.GetRequiredService<IRepository<KnowledgebaseArticle>>();
             _knowledgebaseCategoryRepository = serviceProvider.GetRequiredService<IRepository<KnowledgebaseCategory>>();
-            _banner = serviceProvider.GetRequiredService<IRepository<Banner>>();
             _popupArchive = serviceProvider.GetRequiredService<IRepository<PopupArchive>>();
             _genericAttributeService = serviceProvider.GetRequiredService<IGenericAttributeService>();
-            _customerActionService = serviceProvider.GetRequiredService<ICustomerActionService>();
             _webHelper = serviceProvider.GetRequiredService<IWebHelper>();
-            _hostingEnvironment = serviceProvider.GetRequiredService<IHostingEnvironment>();
+            _hostingEnvironment = serviceProvider.GetRequiredService<IWebHostEnvironment>();
             _serviceProvider = serviceProvider;
         }
 
@@ -297,7 +267,7 @@ namespace Grand.Services.Installation
                     CompanyPhoneNumber = "(123) 456-78901",
                     CompanyVat = null,
                     CompanyEmail = "company@email.com",
-                    CompanyHours = "Monday - Sunday / 8:00AM - 18:00PM"
+                    CompanyHours = "Monday - Sunday / 8:00AM - 6:00PM"
                 },
             };
 
@@ -4853,6 +4823,8 @@ namespace Grand.Services.Installation
                 CategoryThumbPictureSize = 450,
                 ManufacturerThumbPictureSize = 420,
                 VendorThumbPictureSize = 450,
+                CourseThumbPictureSize = 200,
+                LessonThumbPictureSize = 64,
                 CartThumbPictureSize = 80,
                 MiniCartThumbPictureSize = 100,
                 AddToCartThumbPictureSize = 200,
@@ -4991,6 +4963,7 @@ namespace Grand.Services.Installation
                 ShowProductImagesInSearchAutoComplete = true,
                 ShowBestsellersOnHomepage = false,
                 NumberOfBestsellersOnHomepage = 4,
+                PeriodBestsellers = 6,
                 SearchPageProductsPerPage = 6,
                 SearchPageAllowCustomersToSelectPageSize = true,
                 SearchPagePageSizeOptions = "6, 3, 9, 18",
@@ -5091,6 +5064,7 @@ namespace Grand.Services.Installation
                 AllowUsersToDeleteAccount = false,
                 AllowUsersToExportData = false,
                 HideReviewsTab = false,
+                HideCoursesTab = true,
             });
 
             await _settingService.SaveSetting(new AddressSettings {
@@ -9983,6 +9957,18 @@ namespace Grand.Services.Installation
                                                   SystemKeyword = "PublicStore.ViewProduct",
                                                   Enabled = false,
                                                   Name = "Public store. View a product"
+                                              },
+                                          new ActivityLogType
+                                              {
+                                                  SystemKeyword = "PublicStore.ViewCourse",
+                                                  Enabled = false,
+                                                  Name = "Public store. View a course"
+                                              },
+                                          new ActivityLogType
+                                              {
+                                                  SystemKeyword = "PublicStore.ViewLesson",
+                                                  Enabled = false,
+                                                  Name = "Public store. View a lesson"
                                               },
                                           new ActivityLogType
                                               {

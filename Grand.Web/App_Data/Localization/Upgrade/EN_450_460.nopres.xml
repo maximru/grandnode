@@ -635,4 +635,109 @@
   <LocaleResource Name="Admin.Courses.Course.Lesson.Fields.DisplayOrder.hint">
     <Value>Specify the display order of the lesson</Value>
   </LocaleResource>
+  <LocaleResource Name="Admin.Courses.Course.Fields.PurchasedWithProduct.Choose">
+    <Value>Choose product</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Courses.Course.Fields.PurchasedWithProduct.Remove">
+    <Value>Remove</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Courses.Course.Fields.ProductId.Assigned">
+    <Value>This product has been assigned to another course</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Courses.Course.Fields.ProductId">
+    <Value>Purchased with product</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Courses.Course.Fields.ProductId.Hint">
+    <Value>A customer is added to this course once a specified product is purchased (paid).</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Orders.Products.Commission">
+    <Value>Commission</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Vendors.Commission">
+    <Value>Commission</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Vendors.Fields.Commission">
+    <Value>Commisssion</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Vendors.Fields.Commission.Hint">
+    <Value>Commission percentage rate for each vendor</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Vendors.Fields.Commission.IsCommissionValid">
+    <Value>Commission`s rate is no valid</Value>
+  </LocaleResource>
+  <LocaleResource Name="ActivityLog.PublicStore.ViewCourse">
+    <Value>Public store. Viewed a course details page ('{0}')</Value>
+  </LocaleResource>
+  <LocaleResource Name="ActivityLog.PublicStore.ViewLesson">
+    <Value>Public store. Viewed a lesson details page ('{0}')</Value>
+  </LocaleResource>
+  <LocaleResource Name="Course.GoBack">
+    <Value>Go back to the course</Value>
+  </LocaleResource>
+  <LocaleResource Name="Course.ApproveLesson">
+    <Value>Approve lesson</Value>
+  </LocaleResource>
+  <LocaleResource Name="Account.CustomerCourses">
+    <Value>My courses</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Configuration.Settings.CustomerUser.HideCoursesTab">
+    <Value>Hide 'My courses' tab</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Configuration.Settings.CustomerUser.HideCoursesTab.hint">
+    <Value>Check to hide 'My courses' tab on 'My account' page</Value>
+  </LocaleResource>
+  <LocaleResource Name="PageTitle.Courses">
+    <Value>My courses</Value>
+  </LocaleResource>
+  <LocaleResource Name="Account.Courses">
+    <Value>My courses</Value>
+  </LocaleResource>
+  <LocaleResource Name="Account.Courses.NoExists">
+    <Value>You don't have any courses</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Courses.Course.Fields.ShortDescription">
+    <Value>Short description</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Courses.Course.Fields.ShortDescription.Hint">
+    <Value>The short description of the course. </Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Promotions.Discounts.Permisions">
+    <Value>You can't edit this discount, because it can be used in many stores.</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Common.GenericAttributes.AddNew">
+    <Value>Add new generic attribute</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Common.GenericAttributes.AddNew.Button">
+    <Value>Save</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Common.GenericAttributes.Fields.Id.Required">
+    <Value>Id is required.</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Common.GenericAttributes.Fields.Key">
+    <Value>Key</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Common.GenericAttributes.Fields.Key.Required">
+    <Value>Key is required.</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Common.GenericAttributes.Fields.ObjectType.Required">
+    <Value>Object type is required.</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Common.GenericAttributes.Fields.Value">
+    <Value>Value</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Common.GenericAttributes.Fields.Value.Required">
+    <Value>Value is required.</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Common.GenericAttributes.Permission">
+    <Value>You don't have permission to add new value</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Common.GenericAttributes.SaveBeforeEdit">
+    <Value>You need to save object before you can add values.</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.Common.GenericAttributes.Tab">
+    <Value>Generic attributes</Value>
+  </LocaleResource>
+  <LocaleResource Name="admin.common.genericattributes.fields.store">
+    <Value>Select store</Value>
+  </LocaleResource>
 </Language>

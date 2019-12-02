@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.ViewFeatures.Internal;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Logging;
 using System.Linq;
 
@@ -17,8 +17,8 @@ namespace Grand.Framework.Security
         /// </summary>
         public AdminAntiForgeryAttribute(bool ignore = false) : base(typeof(AdminAntiForgeryFilter))
         {
-            this._ignoreFilter = ignore;
-            this.Arguments = new object[] {ignore};
+            _ignoreFilter = ignore;
+            Arguments = new object[] { ignore };
         }
 
         public bool IgnoreFilter => _ignoreFilter;
@@ -43,8 +43,8 @@ namespace Grand.Framework.Security
                 ILoggerFactory loggerFactory)
                 : base(antiforgery, loggerFactory)
             {
-                this._ignoreFilter = ignoreFilter;
-                this._securitySettings = securitySettings;
+                _ignoreFilter = ignoreFilter;
+                _securitySettings = securitySettings;
             }
 
             #endregion
@@ -65,7 +65,7 @@ namespace Grand.Framework.Security
                 var request = context.HttpContext.Request;
                 if (request == null)
                     return false;
-                if (request.Method.ToLower()=="get")
+                if (request.Method.ToLower() == "get")
                     return false;
 
                 //check whether this filter has been overridden for the Action

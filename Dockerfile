@@ -1,4 +1,4 @@
-FROM microsoft/dotnet:2.2-sdk AS build-env
+FROM mcr.microsoft.com/dotnet/core/sdk:3.0.100 AS build-env
 
 WORKDIR /app
 
@@ -47,15 +47,15 @@ RUN dotnet build Plugins/Grand.Plugin.Widgets.GoogleAnalytics
 RUN dotnet build Plugins/Grand.Plugin.Widgets.Slider
 
 # Build runtime image
-FROM microsoft/dotnet:2.2-aspnetcore-runtime 
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.0.0
 RUN apt-get update && \
   apt-get -y install libgdiplus
 RUN ln -s /lib/x86_64-linux-gnu/libdl.so.2 /lib/x86_64-linux-gnu/libdl.so
 
 WORKDIR /app
-COPY --from=build-env /app/Grand.Web/out/ .
+COPY --from=build-env /app/out/ .
 COPY --from=build-env /app/Grand.Web/Plugins/ ./Plugins/
 
 VOLUME /app/App_Data /app/wwwroot /app/Plugins /app/Themes
 
-ENTRYPOINT ["dotnet", "Grand.Web.dll"]
+CMD ["dotnet", "Grand.Web.dll"]

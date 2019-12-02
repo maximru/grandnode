@@ -1,9 +1,12 @@
-﻿using Grand.Core;
+﻿using Autofac;
+using AutoMapper.Configuration;
+using Grand.Core;
 using Grand.Core.Configuration;
 using Grand.Core.Data;
 using Grand.Core.Domain;
 using Grand.Core.Http;
 using Grand.Core.Infrastructure;
+using Grand.Framework.Middleware;
 using Grand.Framework.Mvc.Routing;
 using Grand.Services.Authentication;
 using Grand.Services.Logging;
@@ -15,11 +18,12 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Net.Http.Headers;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using WebMarkupMin.AspNetCore2;
+using WebMarkupMin.AspNetCore3;
 
 namespace Grand.Framework.Infrastructure.Extensions
 {
@@ -32,9 +36,19 @@ namespace Grand.Framework.Infrastructure.Extensions
         /// Configure the application HTTP request pipeline
         /// </summary>
         /// <param name="application">Builder for configuring an application's request pipeline</param>
-        public static void ConfigureRequestPipeline(this IApplicationBuilder application)
+        public static void ConfigureRequestPipeline(this IApplicationBuilder application, IWebHostEnvironment webHostEnvironment)
         {
             EngineContext.Current.ConfigureRequestPipeline(application);
+        }
+
+        /// <summary>
+        /// Configure container
+        /// </summary>
+        /// <param name="container">ContainerBuilder from autofac</param>
+        /// <param name="configuration">configuration</param>
+        public static void ConfigureContainer(this ContainerBuilder container, Microsoft.Extensions.Configuration.IConfiguration configuration)
+        {
+            EngineContext.Current.ConfigureContainer(container, configuration);
         }
 
         /// <summary>
@@ -45,7 +59,7 @@ namespace Grand.Framework.Infrastructure.Extensions
         {
             var serviceProvider = application.ApplicationServices;
             var grandConfig = serviceProvider.GetRequiredService<GrandConfig>();
-            var hostingEnvironment = serviceProvider.GetRequiredService<IHostingEnvironment>();
+            var hostingEnvironment = serviceProvider.GetRequiredService<IWebHostEnvironment>();
             bool useDetailedExceptionPage = grandConfig.DisplayFullErrorStack || hostingEnvironment.IsDevelopment();
             if (useDetailedExceptionPage)
             {
@@ -183,7 +197,10 @@ namespace Grand.Framework.Infrastructure.Extensions
         /// <param name="application">Builder for configuring an application's request pipeline</param>
         public static void UseGrandAuthentication(this IApplicationBuilder application)
         {
-            application.UseMiddleware<AuthenticationMiddleware>();
+            //application.UseMiddleware<AuthenticationMiddleware>();
+            //TO DO AuthenticationMiddleware should be remove and use this
+            application.UseAuthentication();
+            application.UseAuthorization();
         }
 
         /// <summary>
@@ -195,7 +212,7 @@ namespace Grand.Framework.Infrastructure.Extensions
             application.UseMvc(routeBuilder =>
             {
                 //register all routes
-                EngineContext.Current.Resolve<IRoutePublisher>().RegisterRoutes(routeBuilder);
+                routeBuilder.ServiceProvider.GetRequiredService<IRoutePublisher>().RegisterRoutes(routeBuilder);
             });
         }
 
@@ -290,6 +307,20 @@ namespace Grand.Framework.Infrastructure.Extensions
                 .AddContentTypeOptionsNoSniff()
                 .AddStrictTransportSecurityMaxAgeIncludeSubDomains(maxAgeInSeconds: 60 * 60 * 24 * 365) // maxage = one year in seconds
                 .AddReferrerPolicyStrictOriginWhenCrossOrigin()
+                .AddContentSecurityPolicy(builder =>
+                {
+                    builder.AddUpgradeInsecureRequests();
+                    builder.AddDefaultSrc().Self(); 
+                    builder.AddConnectSrc().From("*");
+                    builder.AddFontSrc().From("*");
+                    builder.AddFrameAncestors().From("*");
+                    builder.AddFrameSource().From("*");
+                    builder.AddMediaSrc().From("*");
+                    builder.AddImgSrc().From("*").Data();
+                    builder.AddObjectSrc().From("*");
+                    builder.AddScriptSrc().From("*").UnsafeInline().UnsafeEval();
+                    builder.AddStyleSrc().From("*").UnsafeEval().UnsafeInline();
+                })
                 .RemoveServerHeader();
 
             application.UseSecurityHeaders(policyCollection);

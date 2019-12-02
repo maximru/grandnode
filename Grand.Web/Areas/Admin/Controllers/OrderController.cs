@@ -83,6 +83,34 @@ namespace Grand.Web.Areas.Admin.Controllers
             return View(model);
         }
 
+        public async Task<IActionResult> ProductSearchAutoComplete(string term, [FromServices] IProductService productService)
+        {
+            const int searchTermMinimumLength = 3;
+            if (string.IsNullOrWhiteSpace(term) || term.Length < searchTermMinimumLength)
+                return Content("");
+
+            var storeId = string.Empty;
+            if (_workContext.CurrentCustomer.IsStaff())
+                storeId = _workContext.CurrentCustomer.StaffStoreId;
+
+            //products
+            const int productNumber = 15;
+            var products = (await productService.SearchProducts(
+                storeId: storeId,
+                keywords: term,
+                pageSize: productNumber,
+                showHidden: true)).products;
+
+            var result = (from p in products
+                          select new
+                          {
+                              label = p.Name,
+                              productid = p.Id
+                          })
+                .ToList();
+            return Json(result);
+        }
+
         [HttpPost]
         public async Task<IActionResult> OrderList(DataSourceRequest command, OrderListModel model)
         {
@@ -876,6 +904,38 @@ namespace Grand.Web.Areas.Admin.Controllers
 
             return View(model);
         }
+
+        [HttpPost, ActionName("Edit")]
+        [FormValueRequired("save-generic-attributes")]
+        public async Task<IActionResult> EditGenericAttributes(string id, OrderModel model)
+        {
+            var order = await _orderService.GetOrderById(id);
+            if (order == null)
+                //No order found with the specified id
+                return RedirectToAction("List");
+
+            //a vendor does not have access to this functionality
+            if (_workContext.CurrentVendor != null && !_workContext.CurrentCustomer.IsStaff())
+                return RedirectToAction("Edit", "Order", new { id = id });
+
+            if (_workContext.CurrentCustomer.IsStaff() && order.StoreId != _workContext.CurrentCustomer.StaffStoreId)
+            {
+                return RedirectToAction("Edit", "Order", new { id = id });
+            }
+
+            order.GenericAttributes = model.GenericAttributes;
+
+            await _orderService.UpdateOrder(order);
+            await _orderViewModelService.LogEditOrder(order.Id);
+
+            await _orderViewModelService.PrepareOrderDetailsModel(model, order);
+
+            //selected tab
+            SaveSelectedTabIndex(persistForTheNextRequest: false);
+
+            return View(model);
+        }
+
 
         [HttpPost, ActionName("Edit")]
         [FormValueRequired(FormValueRequirement.StartsWith, "btnSaveOrderItem")]

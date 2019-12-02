@@ -1,5 +1,8 @@
 ﻿using Grand.Core.Domain.Courses;
+using Grand.Web.Areas.Admin.Models.Catalog;
 using Grand.Web.Areas.Admin.Models.Courses;
+using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Grand.Web.Areas.Admin.Interfaces
@@ -14,5 +17,8 @@ namespace Grand.Web.Areas.Admin.Interfaces
         Task<CourseLesson> InsertCourseLessonModel(CourseLessonModel model);
         Task<CourseLesson> UpdateCourseLessonModel(CourseLesson lesson, CourseLessonModel model);
         Task DeleteCourseLesson(CourseLesson lesson);
+
+        Task<CourseModel.AssociateProductToCourseModel> PrepareAssociateProductToCourseModel(HttpContext httpContext);
+        Task<(IList<ProductModel> products, int totalCount)> PrepareProductModel(CourseModel.AssociateProductToCourseModel model, int pageIndex, int pageSize);
     }
 }

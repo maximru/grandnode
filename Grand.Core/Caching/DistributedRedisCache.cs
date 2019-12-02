@@ -12,8 +12,8 @@ namespace Grand.Core.Caching
 
         public DistributedRedisCache(IDistributedCache distributedCache, IDistributedRedisCacheExtended distributedRedisCacheExtended)
         {
-            this._distributedCache = distributedCache;
-            this._distributedRedisCacheExtended = distributedRedisCacheExtended;
+            _distributedCache = distributedCache;
+            _distributedRedisCacheExtended = distributedRedisCacheExtended;
         }
 
         /// <summary>
@@ -28,11 +28,10 @@ namespace Grand.Core.Caching
         }
 
       
-        public virtual T Get<T>(string key)
+        public virtual async Task<T> Get<T>(string key)
         {
-
             //get serialized item from cache
-            var serializedItem = _distributedCache.GetString(key);
+            var serializedItem = await _distributedCache.GetStringAsync(key);
             if (string.IsNullOrEmpty(serializedItem))
                 return default(T);
 

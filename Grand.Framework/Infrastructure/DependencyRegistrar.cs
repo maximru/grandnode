@@ -8,6 +8,7 @@ using Grand.Core.Http;
 using Grand.Core.Infrastructure;
 using Grand.Core.Infrastructure.DependencyManagement;
 using Grand.Core.Plugins;
+using Grand.Framework.Middleware;
 using Grand.Framework.Mvc.Routing;
 using Grand.Framework.TagHelpers;
 using Grand.Framework.Themes;
@@ -110,9 +111,7 @@ namespace Grand.Framework.Infrastructure
             {
                 builder.RegisterType<DistributedRedisCache>().As<ICacheManager>().SingleInstance();
                 builder.RegisterType<DistributedRedisCacheExtended>().As<IDistributedRedisCacheExtended>().SingleInstance();
-
             }
-            
 
             if (config.RunOnAzureWebApps)
             {
@@ -145,6 +144,7 @@ namespace Grand.Framework.Infrastructure
             builder.RegisterType<CopyProductService>().As<ICopyProductService>().InstancePerLifetimeScope();
             builder.RegisterType<ProductReservationService>().As<IProductReservationService>().InstancePerLifetimeScope();
             builder.RegisterType<AuctionService>().As<IAuctionService>().InstancePerLifetimeScope();
+            builder.RegisterType<ProductCourseService>().As<IProductCourseService>().InstancePerLifetimeScope();
 
             builder.RegisterType<SpecificationAttributeService>().As<ISpecificationAttributeService>().InstancePerLifetimeScope();
 
