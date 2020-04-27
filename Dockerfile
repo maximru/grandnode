@@ -1,6 +1,8 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:3.0.100 AS build-env
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build-env
 
 WORKDIR /app
+
+COPY NuGet.config /root/.config/NuGet/
 
 COPY GrandNode.sln .
 COPY Grand.Core/Grand.Core.csproj Grand.Core/Grand.Core.csproj
@@ -23,6 +25,7 @@ COPY Plugins/Grand.Plugin.Shipping.ShippingPoint/Grand.Plugin.Shipping.ShippingP
 COPY Plugins/Grand.Plugin.Tax.CountryStateZip/Grand.Plugin.Tax.CountryStateZip.csproj Plugins/Grand.Plugin.Tax.CountryStateZip/Grand.Plugin.Tax.CountryStateZip.csproj
 COPY Plugins/Grand.Plugin.Tax.FixedRate/Grand.Plugin.Tax.FixedRate.csproj Plugins/Grand.Plugin.Tax.FixedRate/Grand.Plugin.Tax.FixedRate.csproj
 COPY Plugins/Grand.Plugin.Widgets.GoogleAnalytics/Grand.Plugin.Widgets.GoogleAnalytics.csproj Plugins/Grand.Plugin.Widgets.GoogleAnalytics/Grand.Plugin.Widgets.GoogleAnalytics.csproj
+COPY Plugins/Grand.Plugin.Widgets.FacebookPixel/Grand.Plugin.Widgets.FacebookPixel.csproj Plugins/Grand.Plugin.Widgets.FacebookPixel/Grand.Plugin.Widgets.FacebookPixel.csproj
 COPY Plugins/Grand.Plugin.Widgets.Slider/Grand.Plugin.Widgets.Slider.csproj Plugins/Grand.Plugin.Widgets.Slider/Grand.Plugin.Widgets.Slider.csproj
 
 # Copy everything else and build
@@ -44,10 +47,11 @@ RUN dotnet build Plugins/Grand.Plugin.Shipping.ShippingPoint
 RUN dotnet build Plugins/Grand.Plugin.Tax.CountryStateZip
 RUN dotnet build Plugins/Grand.Plugin.Tax.FixedRate
 RUN dotnet build Plugins/Grand.Plugin.Widgets.GoogleAnalytics
+RUN dotnet build Plugins/Grand.Plugin.Widgets.FacebookPixel
 RUN dotnet build Plugins/Grand.Plugin.Widgets.Slider
 
 # Build runtime image
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.0.0
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.1.0
 RUN apt-get update && \
   apt-get -y install libgdiplus
 RUN ln -s /lib/x86_64-linux-gnu/libdl.so.2 /lib/x86_64-linux-gnu/libdl.so

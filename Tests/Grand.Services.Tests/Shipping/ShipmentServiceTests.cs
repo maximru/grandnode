@@ -29,7 +29,6 @@ namespace Grand.Services.Shipping.Tests
         private IRepository<ShippingMethod> _shippingMethodRepository;
         private IRepository<DeliveryDate> _deliveryDateRepository;
         private IRepository<Warehouse> _warehouseRepository;
-        private IRepository<PickupPoint> _pickupPointRepository;
         private ILogger _logger;
         private IProductAttributeParser _productAttributeParser;
         private ICheckoutAttributeParser _checkoutAttributeParser;
@@ -37,8 +36,6 @@ namespace Grand.Services.Shipping.Tests
         private IMediator _eventPublisher;
         private ILocalizationService _localizationService;
         private IAddressService _addressService;
-        private IGenericAttributeService _genericAttributeService;
-        private IShippingService _shippingService;
         private ShoppingCartSettings _shoppingCartSettings;
         private IProductService _productService;
         private Store _store;
@@ -64,10 +61,15 @@ namespace Grand.Services.Shipping.Tests
             _logger = new NullLogger();
             _productAttributeParser = new Mock<IProductAttributeParser>().Object;
             _checkoutAttributeParser = new Mock<ICheckoutAttributeParser>().Object;
-            _pickupPointRepository = new Mock<IRepository<PickupPoint>>().Object;
             _serviceProvider = new Mock<IServiceProvider>().Object;
+            
+            var tempEventPublisher = new Mock<IMediator>();
+            {
+                //tempEventPublisher.Setup(x => x.Publish(It.IsAny<object>()));
+                _eventPublisher = tempEventPublisher.Object;
+            }
 
-            var cacheManager = new TestMemoryCacheManager(new Mock<IMemoryCache>().Object);
+            var cacheManager = new TestMemoryCacheManager(new Mock<IMemoryCache>().Object, _eventPublisher);
 
             var pluginFinder = new PluginFinder(_serviceProvider);
             _countryService = new Mock<ICountryService>().Object;
@@ -75,15 +77,10 @@ namespace Grand.Services.Shipping.Tests
             _currencyService = new Mock<ICurrencyService>().Object;
             _productService = new Mock<IProductService>().Object;
 
-            var tempEventPublisher = new Mock<IMediator>();
-            {
-                //tempEventPublisher.Setup(x => x.Publish(It.IsAny<object>()));
-                _eventPublisher = tempEventPublisher.Object;
-            }
+            
 
             _localizationService = new Mock<ILocalizationService>().Object;
             _addressService = new Mock<IAddressService>().Object;
-            _genericAttributeService = new Mock<IGenericAttributeService>().Object;
 
             _store = new Store { Id = "1" };
             var tempStoreContext = new Mock<IStoreContext>();
@@ -93,27 +90,6 @@ namespace Grand.Services.Shipping.Tests
             }
 
             _shoppingCartSettings = new ShoppingCartSettings();
-            _shippingService = new ShippingService(_shippingMethodRepository,
-            _deliveryDateRepository,
-            _warehouseRepository,
-            null,
-            _logger,
-            _productService,
-            _productAttributeParser,
-            _checkoutAttributeParser,
-            _genericAttributeService,
-            _localizationService,
-            _addressService,
-            _countryService,
-            _stateProvinceService,
-            pluginFinder,
-            _storeContext,
-            _eventPublisher,
-            _currencyService,
-            cacheManager,
-            null,
-            _shoppingCartSettings,
-            _shippingSettings);
         }
 
         //TO DO

@@ -2,7 +2,6 @@
 using Grand.Core.Domain.Customers;
 using Grand.Core.Domain.Forums;
 using Grand.Framework.Controllers;
-using Grand.Framework.Security;
 using Grand.Services.Customers;
 using Grand.Services.Forums;
 using Grand.Services.Helpers;
@@ -90,8 +89,7 @@ namespace Grand.Web.Controllers
                     break;
             }
 
-            var model = new PrivateMessageIndexModel
-            {
+            var model = new PrivateMessageIndexModel {
                 InboxPage = inboxPage,
                 SentItemsPage = sentItemsPage,
                 SentItemsTabSelected = sentItemsTabSelected
@@ -101,7 +99,7 @@ namespace Grand.Web.Controllers
         }
 
         [HttpPost, FormValueRequired("delete-inbox"), ActionName("InboxUpdate")]
-        [PublicAntiForgery]
+        [AutoValidateAntiforgeryToken]
         public virtual async Task<IActionResult> DeleteInboxPM(IFormCollection formCollection)
         {
             foreach (var key in formCollection.Keys)
@@ -126,7 +124,7 @@ namespace Grand.Web.Controllers
         }
 
         [HttpPost, FormValueRequired("mark-unread"), ActionName("InboxUpdate")]
-        [PublicAntiForgery]
+        [AutoValidateAntiforgeryToken]
         public virtual async Task<IActionResult> MarkUnread(IFormCollection formCollection)
         {
             foreach (var key in formCollection.Keys)
@@ -152,7 +150,7 @@ namespace Grand.Web.Controllers
 
         //updates sent items (deletes PrivateMessages)
         [HttpPost, FormValueRequired("delete-sent"), ActionName("SentUpdate")]
-        [PublicAntiForgery]
+        [AutoValidateAntiforgeryToken]
         public virtual async Task<IActionResult> DeleteSentPM(IFormCollection formCollection)
         {
             foreach (var key in formCollection.Keys)
@@ -223,7 +221,7 @@ namespace Grand.Web.Controllers
         }
 
         [HttpPost]
-        [PublicAntiForgery]
+        [AutoValidateAntiforgeryToken]
         public virtual async Task<IActionResult> SendPM(SendPrivateMessageModel model)
         {
             if (!_forumSettings.AllowPrivateMessages)
@@ -283,8 +281,7 @@ namespace Grand.Web.Controllers
 
                     var nowUtc = DateTime.UtcNow;
 
-                    var privateMessage = new PrivateMessage
-                    {
+                    var privateMessage = new PrivateMessage {
                         StoreId = _storeContext.CurrentStore.Id,
                         ToCustomerId = toCustomer.Id,
                         FromCustomerId = _workContext.CurrentCustomer.Id,
@@ -347,8 +344,7 @@ namespace Grand.Web.Controllers
             var toCustomer = await _customerService.GetCustomerById(pm.ToCustomerId);
 
 
-            var model = new PrivateMessageModel
-            {
+            var model = new PrivateMessageModel {
                 Id = pm.Id,
                 FromCustomerId = fromCustomer.Id,
                 CustomerFromName = fromCustomer.FormatUserName(_customerSettings.CustomerNameFormat),

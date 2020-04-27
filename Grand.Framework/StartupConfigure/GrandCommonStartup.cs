@@ -1,8 +1,10 @@
 ﻿using Grand.Core.Configuration;
 using Grand.Core.Infrastructure;
 using Grand.Framework.Infrastructure.Extensions;
+using Grand.Framework.Mvc.Routing;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
@@ -34,26 +36,11 @@ namespace Grand.Framework.StartupConfigure
             //add options feature
             services.AddOptions();
             
-            //add memory cache
-            services.AddMemoryCache();
-
-            //add distributed memory cache
-            services.AddDistributedMemoryCache();
-
-            //add distributed Redis cache
-            if (config.RedisCachingEnabled)
-            {
-                services.AddStackExchangeRedisCache(options =>
-                {
-                    options.Configuration = config.RedisCachingConnectionString;
-                });
-            }
-
             //add HTTP sesion state feature
-            services.AddHttpSession();
+            services.AddHttpSession(config);
 
             //add anti-forgery
-            services.AddAntiForgery();
+            services.AddAntiForgery(config);
 
             //add localization
             services.AddLocalization();
@@ -63,6 +50,12 @@ namespace Grand.Framework.StartupConfigure
 
             //add WebEncoderOptions
             services.AddWebEncoder();
+
+            services.AddRouting(options =>
+            {
+                options.ConstraintMap["lang"] = typeof(LanguageParameterTransformer);
+            });
+
         }
 
         /// <summary>
@@ -73,6 +66,9 @@ namespace Grand.Framework.StartupConfigure
         {
             var serviceProvider = application.ApplicationServices;
             var grandConfig = serviceProvider.GetRequiredService<GrandConfig>();
+
+            //add HealthChecks
+            application.UseGrandHealthChecks();
 
             //default security headers
             if (grandConfig.UseDefaultSecurityHeaders)
@@ -104,6 +100,24 @@ namespace Grand.Framework.StartupConfigure
                 application.UseHtmlMinification();
             }
 
+            //use request localization
+            if (grandConfig.UseRequestLocalization)
+            {
+                var supportedCultures = new List<CultureInfo>();
+                foreach (var culture in grandConfig.SupportedCultures)
+                {
+                    supportedCultures.Add(new CultureInfo(culture));
+                }
+                application.UseRequestLocalization(new RequestLocalizationOptions {
+                    DefaultRequestCulture = new RequestCulture(grandConfig.DefaultRequestCulture),
+                    SupportedCultures = supportedCultures,
+                    SupportedUICultures = supportedCultures
+                });
+            }
+            else
+                //use default request localization
+                application.UseRequestLocalization();
+
             //use static files feature
             application.UseGrandStaticFiles(grandConfig);
 
@@ -118,24 +132,8 @@ namespace Grand.Framework.StartupConfigure
             if (!grandConfig.IgnoreUsePoweredByMiddleware)
                 application.UsePoweredBy();
 
-            //use request localization
-            if (grandConfig.UseRequestLocalization)
-            {
-                var supportedCultures = new List<CultureInfo>();
-                foreach (var culture in grandConfig.SupportedCultures)
-                {
-                    supportedCultures.Add(new CultureInfo(culture));
-                }
-                application.UseRequestLocalization(new RequestLocalizationOptions
-                {
-                    DefaultRequestCulture = new RequestCulture(grandConfig.DefaultRequestCulture),
-                    SupportedCultures = supportedCultures,
-                    SupportedUICultures = supportedCultures
-                });
-            }
-            else
-                //use default request localization
-                application.UseRequestLocalization();
+            //use routing
+            application.UseRouting();
 
         }
 

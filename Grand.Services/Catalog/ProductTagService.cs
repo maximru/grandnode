@@ -29,6 +29,12 @@ namespace Grand.Services.Catalog
         private const string PRODUCTTAG_COUNT_KEY = "Grand.producttag.count-{0}";
 
         /// <summary>
+        /// Key for all tags
+        /// </summary>
+        private const string PRODUCTTAG_ALL_KEY = "Grand.producttag.all";
+
+
+        /// <summary>
         /// Key pattern to clear cache
         /// </summary>
         private const string PRODUCTTAG_PATTERN_KEY = "Grand.producttag.";
@@ -80,7 +86,7 @@ namespace Grand.Services.Catalog
         }
 
         #endregion
-        
+
         #region Utilities
 
         /// <summary>
@@ -88,20 +94,19 @@ namespace Grand.Services.Catalog
         /// </summary>
         /// <param name="storeId">Store identifier</param>
         /// <returns>Dictionary of "product tag ID : product count"</returns>
-        private Dictionary<string, int> GetProductCount(string storeId)
+        private async Task<Dictionary<string, int>> GetProductCount(string storeId)
         {
             string key = string.Format(PRODUCTTAG_COUNT_KEY, storeId);
-            return _cacheManager.Get(key, () =>
-            {
-                var query = from pt in _productTagRepository.Table
-                            select pt;
+            return await _cacheManager.GetAsync(key, async () =>
+             {
+                 var query = from pt in _productTagRepository.Table
+                             select pt;
 
-                var dictionary = new Dictionary<string, int>();
-                foreach (var item in query.ToList())
-                    dictionary.Add(item.Id, item.Count);
-                return dictionary;
-
-            });
+                 var dictionary = new Dictionary<string, int>();
+                 foreach (var item in await query.ToListAsync())
+                     dictionary.Add(item.Id, item.Count);
+                 return dictionary;
+             });
         }
 
         #endregion
@@ -124,8 +129,8 @@ namespace Grand.Services.Catalog
             await _productTagRepository.DeleteAsync(productTag);
 
             //cache
-            await _cacheManager.RemoveByPattern(PRODUCTTAG_PATTERN_KEY);
-            await _cacheManager.RemoveByPattern(PRODUCTS_PATTERN_KEY);
+            await _cacheManager.RemoveByPrefix(PRODUCTTAG_PATTERN_KEY);
+            await _cacheManager.RemoveByPrefix(PRODUCTS_PATTERN_KEY);
 
             //event notification
             await _mediator.EntityDeleted(productTag);
@@ -137,8 +142,11 @@ namespace Grand.Services.Catalog
         /// <returns>Product tags</returns>
         public virtual async Task<IList<ProductTag>> GetAllProductTags()
         {
-            var query = _productTagRepository.Table;
-            return await query.ToListAsync();
+            return await _cacheManager.GetAsync(PRODUCTTAG_ALL_KEY, async () =>
+            {
+                var query = _productTagRepository.Table;
+                return await query.ToListAsync();
+            });
         }
 
         /// <summary>
@@ -190,7 +198,7 @@ namespace Grand.Services.Catalog
             await _productTagRepository.InsertAsync(productTag);
 
             //cache
-            await _cacheManager.RemoveByPattern(PRODUCTTAG_PATTERN_KEY);
+            await _cacheManager.RemoveByPrefix(PRODUCTTAG_PATTERN_KEY);
 
             //event notification
             await _mediator.EntityInserted(productTag);
@@ -219,7 +227,7 @@ namespace Grand.Services.Catalog
             await _productRepository.Collection.UpdateManyAsync(filter, update);
 
             //cache
-            await _cacheManager.RemoveByPattern(PRODUCTTAG_PATTERN_KEY);
+            await _cacheManager.RemoveByPrefix(PRODUCTTAG_PATTERN_KEY);
 
             //event notification
             await _mediator.EntityUpdated(productTag);
@@ -231,12 +239,12 @@ namespace Grand.Services.Catalog
         /// <param name="productTagId">Product tag identifier</param>
         /// <param name="storeId">Store identifier</param>
         /// <returns>Number of products</returns>
-        public virtual int GetProductCount(string productTagId, string storeId)
+        public virtual async Task<int> GetProductCount(string productTagId, string storeId)
         {
-            var dictionary = GetProductCount(storeId);
+            var dictionary = await GetProductCount(storeId);
             if (dictionary.ContainsKey(productTagId))
                 return dictionary[productTagId];
-            
+
             return 0;
         }
 

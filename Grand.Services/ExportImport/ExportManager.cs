@@ -178,7 +178,7 @@ namespace Grand.Services.ExportImport
                 xmlWriter.WriteElementString("UpdatedOnUtc", null, manufacturer.UpdatedOnUtc.ToString());
 
                 xmlWriter.WriteStartElement("Products");
-                var productManufacturers = await _manufacturerService.GetProductManufacturersByManufacturerId(manufacturer.Id, showHidden: true);
+                var productManufacturers = await _manufacturerService.GetProductManufacturersByManufacturerId(manufacturer.Id, "", showHidden: true);
                 if (productManufacturers != null)
                 {
                     var productService = _serviceProvider.GetRequiredService<IProductService>();
@@ -370,7 +370,7 @@ namespace Grand.Services.ExportImport
                 xmlWriter.WriteElementString("DeliveryDateId", null, product.DeliveryDateId);
                 xmlWriter.WriteElementString("IsTaxExempt", null, product.IsTaxExempt.ToString());
                 xmlWriter.WriteElementString("TaxCategoryId", null, product.TaxCategoryId);
-                xmlWriter.WriteElementString("IsTelecommunicationsOrBroadcastingOrElectronicServices", null, product.IsTelecommunicationsOrBroadcastingOrElectronicServices.ToString());
+                xmlWriter.WriteElementString("IsTele", null, product.IsTele.ToString());
                 xmlWriter.WriteElementString("ManageInventoryMethodId", null, product.ManageInventoryMethodId.ToString());
                 xmlWriter.WriteElementString("UseMultipleWarehouses", null, product.UseMultipleWarehouses.ToString());
                 xmlWriter.WriteElementString("WarehouseId", null, product.WarehouseId);
@@ -636,7 +636,7 @@ namespace Grand.Services.ExportImport
                 new PropertyByName<Product>("DeliveryDateId", p => p.DeliveryDateId),
                 new PropertyByName<Product>("IsTaxExempt", p => p.IsTaxExempt),
                 new PropertyByName<Product>("TaxCategoryId", p => p.TaxCategoryId),
-                new PropertyByName<Product>("IsTelecommunicationsOrBroadcastingOrElectronicServices", p => p.IsTelecommunicationsOrBroadcastingOrElectronicServices),
+                new PropertyByName<Product>("IsTele", p => p.IsTele),
                 new PropertyByName<Product>("ManageInventoryMethodId", p => p.ManageInventoryMethodId),
                 new PropertyByName<Product>("UseMultipleWarehouses", p => p.UseMultipleWarehouses),
                 new PropertyByName<Product>("WarehouseId", p => p.WarehouseId),
@@ -712,6 +712,7 @@ namespace Grand.Services.ExportImport
                 xmlWriter.WriteStartElement("Order");
 
                 xmlWriter.WriteElementString("OrderId", null, order.Id.ToString());
+                xmlWriter.WriteElementString("OrderCode", null, order.Code);
                 xmlWriter.WriteElementString("OrderGuid", null, order.OrderGuid.ToString());
                 xmlWriter.WriteElementString("StoreId", null, order.StoreId.ToString());
                 xmlWriter.WriteElementString("CustomerId", null, order.CustomerId.ToString());
@@ -1205,6 +1206,7 @@ namespace Grand.Services.ExportImport
             var properties = new[]
             {
                     new PropertyByName<Order>("OrderNumber", p=>p.OrderNumber),
+                    new PropertyByName<Order>("OrderCode", p=>p.Code),
                     new PropertyByName<Order>("OrderId", p=>p.Id),
                     new PropertyByName<Order>("StoreId", p=>p.StoreId),
                     new PropertyByName<Order>("OrderGuid",p=>p.OrderGuid),

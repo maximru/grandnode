@@ -29,7 +29,6 @@ namespace Grand.Web.Areas.Admin.Services
         private readonly IManufacturerService _manufacturerService;
         private readonly IStoreService _storeService;
         private readonly IVendorService _vendorService;
-        private readonly IWorkContext _workContext;
         private readonly ICustomerTagService _customerTagService;
         private readonly IDateTimeHelper _dateTimeHelper;
 
@@ -41,7 +40,6 @@ namespace Grand.Web.Areas.Admin.Services
            IManufacturerService manufacturerService,
            IStoreService storeService,
            IVendorService vendorService,
-           IWorkContext workContext,
            ICustomerTagService customerTagService,
            IDateTimeHelper dateTimeHelper)
         {
@@ -52,7 +50,6 @@ namespace Grand.Web.Areas.Admin.Services
             _manufacturerService = manufacturerService;
             _storeService = storeService;
             _vendorService = vendorService;
-            _workContext = workContext;
             _customerTagService = customerTagService;
             _dateTimeHelper = dateTimeHelper;
         }
@@ -105,7 +102,7 @@ namespace Grand.Web.Areas.Admin.Services
             model.AvailableCategories.Add(new SelectListItem { Text = _localizationService.GetResource("Admin.Common.All"), Value = " " });
             var categories = await _categoryService.GetAllCategories(showHidden: true);
             foreach (var c in categories)
-                model.AvailableCategories.Add(new SelectListItem { Text = c.GetFormattedBreadCrumb(categories), Value = c.Id.ToString() });
+                model.AvailableCategories.Add(new SelectListItem { Text = _categoryService.GetFormattedBreadCrumb(c, categories), Value = c.Id.ToString() });
 
             //manufacturers
             model.AvailableManufacturers.Add(new SelectListItem { Text = _localizationService.GetResource("Admin.Common.All"), Value = " " });
@@ -115,7 +112,7 @@ namespace Grand.Web.Areas.Admin.Services
             //stores
             model.AvailableStores.Add(new SelectListItem { Text = _localizationService.GetResource("Admin.Common.All"), Value = " " });
             foreach (var s in await _storeService.GetAllStores())
-                model.AvailableStores.Add(new SelectListItem { Text = s.Name, Value = s.Id.ToString() });
+                model.AvailableStores.Add(new SelectListItem { Text = s.Shortcut, Value = s.Id.ToString() });
 
             //vendors
             model.AvailableVendors.Add(new SelectListItem { Text = _localizationService.GetResource("Admin.Common.All"), Value = " " });

@@ -56,6 +56,21 @@ namespace Grand.Services.Shipping
         private const string PICKUPPOINTS_PATTERN_KEY = "Grand.pickuppoint.";
 
         /// <summary>
+        /// Key for caching
+        /// </summary>
+        /// <remarks>
+        /// {0} : delivery date ID
+        /// </remarks>
+        private const string DELIVERYDATE_BY_ID_KEY = "Grand.deliverydate.id-{0}";
+
+        /// <summary>
+        /// Key for caching
+        /// </summary>
+        /// <remarks>
+        /// </remarks>
+        private const string DELIVERYDATE_PATTERN_KEY = "Grand.deliverydate.";
+
+        /// <summary>
         /// Key pattern to clear cache
         /// </summary>
         private const string PRODUCTS_PATTERN_KEY = "Grand.product.";
@@ -73,7 +88,6 @@ namespace Grand.Services.Shipping
         private readonly IProductService _productService;
         private readonly IProductAttributeParser _productAttributeParser;
         private readonly ICheckoutAttributeParser _checkoutAttributeParser;
-        private readonly IGenericAttributeService _genericAttributeService;
         private readonly ILocalizationService _localizationService;
         private readonly IAddressService _addressService;
         private readonly ICountryService _countryService;
@@ -101,7 +115,6 @@ namespace Grand.Services.Shipping
             IProductService productService,
             IProductAttributeParser productAttributeParser,
             ICheckoutAttributeParser checkoutAttributeParser,
-            IGenericAttributeService genericAttributeService,
             ILocalizationService localizationService,
             IAddressService addressService,
             ICountryService countryService,
@@ -123,7 +136,6 @@ namespace Grand.Services.Shipping
             _productService = productService;
             _productAttributeParser = productAttributeParser;
             _checkoutAttributeParser = checkoutAttributeParser;
-            _genericAttributeService = genericAttributeService;
             _localizationService = localizationService;
             _addressService = addressService;
             _countryService = countryService;
@@ -205,7 +217,7 @@ namespace Grand.Services.Shipping
             await _shippingMethodRepository.DeleteAsync(shippingMethod);
 
             //clear cache
-            await _cacheManager.RemoveByPattern(SHIPPINGMETHOD_PATTERN_KEY);
+            await _cacheManager.RemoveByPrefix(SHIPPINGMETHOD_PATTERN_KEY);
 
             //event notification
             await _mediator.EntityDeleted(shippingMethod);
@@ -262,7 +274,7 @@ namespace Grand.Services.Shipping
             await _shippingMethodRepository.InsertAsync(shippingMethod);
 
             //clear cache
-            await _cacheManager.RemoveByPattern(SHIPPINGMETHOD_PATTERN_KEY);
+            await _cacheManager.RemoveByPrefix(SHIPPINGMETHOD_PATTERN_KEY);
 
             //event notification
             await _mediator.EntityInserted(shippingMethod);
@@ -280,7 +292,7 @@ namespace Grand.Services.Shipping
             await _shippingMethodRepository.UpdateAsync(shippingMethod);
 
             //clear cache
-            await _cacheManager.RemoveByPattern(SHIPPINGMETHOD_PATTERN_KEY);
+            await _cacheManager.RemoveByPrefix(SHIPPINGMETHOD_PATTERN_KEY);
 
             //event notification
             await _mediator.EntityUpdated(shippingMethod);
@@ -306,7 +318,10 @@ namespace Grand.Services.Shipping
             await _productRepository.Collection.UpdateManyAsync(filter, update);
 
             await _deliveryDateRepository.DeleteAsync(deliveryDate);
-            await _cacheManager.RemoveByPattern(PRODUCTS_PATTERN_KEY);
+
+            //clear cache
+            await _cacheManager.RemoveByPrefix(PRODUCTS_PATTERN_KEY);
+            await _cacheManager.RemoveByPrefix(DELIVERYDATE_PATTERN_KEY);
 
             //event notification
             await _mediator.EntityDeleted(deliveryDate);
@@ -319,7 +334,8 @@ namespace Grand.Services.Shipping
         /// <returns>Delivery date</returns>
         public virtual Task<DeliveryDate> GetDeliveryDateById(string deliveryDateId)
         {
-            return _deliveryDateRepository.GetByIdAsync(deliveryDateId);
+            string key = string.Format(DELIVERYDATE_BY_ID_KEY, deliveryDateId);
+            return _cacheManager.GetAsync(key, () => _deliveryDateRepository.GetByIdAsync(deliveryDateId));
         }
 
         /// <summary>
@@ -360,6 +376,9 @@ namespace Grand.Services.Shipping
 
             await _deliveryDateRepository.UpdateAsync(deliveryDate);
 
+            //clear cache
+            await _cacheManager.RemoveByPrefix(DELIVERYDATE_PATTERN_KEY);
+
             //event notification
             await _mediator.EntityUpdated(deliveryDate);
         }
@@ -390,8 +409,8 @@ namespace Grand.Services.Shipping
             await _warehouseRepository.DeleteAsync(warehouse);
 
             //clear cache
-            await _cacheManager.RemoveByPattern(WAREHOUSES_PATTERN_KEY);
-            await _cacheManager.RemoveByPattern(PRODUCTS_PATTERN_KEY);
+            await _cacheManager.RemoveByPrefix(WAREHOUSES_PATTERN_KEY);
+            await _cacheManager.RemoveByPrefix(PRODUCTS_PATTERN_KEY);
 
             //event notification
             await _mediator.EntityDeleted(warehouse);
@@ -432,7 +451,7 @@ namespace Grand.Services.Shipping
             await _warehouseRepository.InsertAsync(warehouse);
 
             //clear cache
-            await _cacheManager.RemoveByPattern(WAREHOUSES_PATTERN_KEY);
+            await _cacheManager.RemoveByPrefix(WAREHOUSES_PATTERN_KEY);
 
             //event notification
             await _mediator.EntityInserted(warehouse);
@@ -450,7 +469,7 @@ namespace Grand.Services.Shipping
             await _warehouseRepository.UpdateAsync(warehouse);
 
             //clear cache
-            await _cacheManager.RemoveByPattern(WAREHOUSES_PATTERN_KEY);
+            await _cacheManager.RemoveByPrefix(WAREHOUSES_PATTERN_KEY);
 
             //event notification
             await _mediator.EntityUpdated(warehouse);
@@ -510,7 +529,7 @@ namespace Grand.Services.Shipping
             await _pickupPointsRepository.InsertAsync(pickupPoint);
 
             //clear cache
-            await _cacheManager.RemoveByPattern(PICKUPPOINTS_PATTERN_KEY);
+            await _cacheManager.RemoveByPrefix(PICKUPPOINTS_PATTERN_KEY);
 
             //event notification
             await _mediator.EntityInserted(pickupPoint);
@@ -528,7 +547,7 @@ namespace Grand.Services.Shipping
             await _pickupPointsRepository.UpdateAsync(pickupPoint);
 
             //clear cache
-            await _cacheManager.RemoveByPattern(WAREHOUSES_PATTERN_KEY);
+            await _cacheManager.RemoveByPrefix(WAREHOUSES_PATTERN_KEY);
 
             //event notification
             await _mediator.EntityUpdated(pickupPoint);
@@ -544,7 +563,7 @@ namespace Grand.Services.Shipping
                 throw new ArgumentNullException("pickupPoint");
 
             await _pickupPointsRepository.DeleteAsync(pickupPoint);
-            await _cacheManager.RemoveByPattern(PICKUPPOINTS_PATTERN_KEY);
+            await _cacheManager.RemoveByPrefix(PICKUPPOINTS_PATTERN_KEY);
 
             //event notification
             await _mediator.EntityDeleted(pickupPoint);

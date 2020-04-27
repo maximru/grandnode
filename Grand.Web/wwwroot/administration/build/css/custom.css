@@ -297,7 +297,6 @@ body {
 }
 
 .nav-sm .nav.side-menu li a i {
-    font-size: 25px !important;
     text-align: center;
     width: 100% !important;
     margin-bottom: 5px
@@ -2683,6 +2682,21 @@ button, .buttons, .btn, .modal-footer .btn+.btn {
 
 .input-group {
     margin-bottom: 10px
+}
+
+.custom-input-group.input-group {
+    display: inline-flex;
+    padding-right: 10px;
+    padding-left: 10px;
+}
+.custom-input-group.input-group .form-control {
+    margin-right: 5px;
+    padding: 6px 12px;
+}
+.custom-input-group.input-group .input-group-addon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .ln_solid {
@@ -5597,10 +5611,6 @@ label {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
 }
 
-.k-window-content {
-    overflow: -webkit-paged-y!important;
-}
-
 .a, button, code, div, img, input, label, li, p, pre, select, span, svg, table, td, textarea, th, ul {
     border-radius: 0!important;
 }
@@ -6236,3 +6246,15 @@ table.tableFixHead {
 .list-toggle .uppercase {
     font-size: 18px;
 }
+.table > tbody > tr > td {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    -ms-word-break: break-all;
+    word-break: break-all;
+    word-break: break-word;
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+}
+

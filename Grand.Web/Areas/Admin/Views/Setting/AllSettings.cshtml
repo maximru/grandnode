@@ -6,7 +6,7 @@
     //page title
     ViewBag.Title = T("Admin.Configuration.Settings.AllSettings").Text;
 }
-<antiforgery-token />
+
 <div class="row">
     <div class="col-md-12">
         <div class="x_panel light form-fit">
@@ -175,7 +175,7 @@
             <text>
             , {
                 Id: "@(store.Id)",
-                Name: "@(Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(store.Name)))"
+                Name: "@(Html.Raw(store.Shortcut))"
             }
             </text>
         }

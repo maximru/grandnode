@@ -91,7 +91,7 @@ namespace Grand.Plugin.DiscountRequirements.HasOneProduct.Controllers
         }
 
         [HttpPost]
-        [AdminAntiForgery]
+        [AutoValidateAntiforgeryToken]
         public async Task<IActionResult> Configure(string discountId, string discountRequirementId, string productIds)
         {
             if (!await _permissionService.Authorize(StandardPermissionProvider.ManageDiscounts))
@@ -138,7 +138,7 @@ namespace Grand.Plugin.DiscountRequirements.HasOneProduct.Controllers
             model.AvailableCategories.Add(new SelectListItem { Text = _localizationService.GetResource("Admin.Common.All"), Value = "" });
             var categories = await _categoryService.GetAllCategories(showHidden: true);
             foreach (var c in categories)
-                model.AvailableCategories.Add(new SelectListItem { Text = c.GetFormattedBreadCrumb(categories), Value = c.Id.ToString() });
+                model.AvailableCategories.Add(new SelectListItem { Text = _categoryService.GetFormattedBreadCrumb(c, categories), Value = c.Id.ToString() });
 
             //manufacturers
             model.AvailableManufacturers.Add(new SelectListItem { Text = _localizationService.GetResource("Admin.Common.All"), Value = "" });
@@ -148,7 +148,7 @@ namespace Grand.Plugin.DiscountRequirements.HasOneProduct.Controllers
             //stores
             model.AvailableStores.Add(new SelectListItem { Text = _localizationService.GetResource("Admin.Common.All"), Value = "" });
             foreach (var s in await _storeService.GetAllStores())
-                model.AvailableStores.Add(new SelectListItem { Text = s.Name, Value = s.Id.ToString() });
+                model.AvailableStores.Add(new SelectListItem { Text = s.Shortcut, Value = s.Id.ToString() });
 
             //vendors
             model.AvailableVendors.Add(new SelectListItem { Text = _localizationService.GetResource("Admin.Common.All"), Value = "" });
@@ -167,7 +167,7 @@ namespace Grand.Plugin.DiscountRequirements.HasOneProduct.Controllers
         }
 
         [HttpPost]
-        [AdminAntiForgery]
+        [AutoValidateAntiforgeryToken]
         public async Task<IActionResult> ProductAddPopupList(DataSourceRequest command, RequirementModel.AddProductModel model)
         {
             if (!await _permissionService.Authorize(StandardPermissionProvider.ManageProducts))
@@ -207,7 +207,7 @@ namespace Grand.Plugin.DiscountRequirements.HasOneProduct.Controllers
         }
 
         [HttpPost]
-        [AdminAntiForgery]
+        [AutoValidateAntiforgeryToken]
         public async Task<IActionResult> LoadProductFriendlyNames(string productIds)
         {
             var result = "";
@@ -240,7 +240,7 @@ namespace Grand.Plugin.DiscountRequirements.HasOneProduct.Controllers
                     ids.Add(str2);
                 }
 
-                var products = await _productService.GetProductsByIds(ids.ToArray());
+                var products = await _productService.GetProductsByIds(ids.ToArray(), true);
                 for (int i = 0; i <= products.Count - 1; i++)
                 {
                     result += products[i].Name;

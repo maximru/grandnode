@@ -106,9 +106,9 @@ namespace Grand.Core.Domain.Orders
         public int GiftCards_Activated_OrderStatusId { get; set; }
 
         /// <summary>
-        ///  Gift cards are deactivated when the order status is
+        ///  Gift cards are deactivated when the order is canceled
         /// </summary>
-        public int GiftCards_Deactivated_OrderStatusId { get; set; }
+        public bool DeactivateGiftCardsAfterCancelOrder { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether to deactivate related gift cards after deleting the order
@@ -138,5 +138,10 @@ namespace Grand.Core.Domain.Orders
         /// Gets or sets a value indicating whether customers can add order notes
         /// </summary>
         public bool AllowCustomerToAddOrderNote { get; set; }
+
+        /// <summary>
+        /// Gets or sets a length for order code
+        /// </summary>
+        public int LengthCode { get; set; }
     }
 }

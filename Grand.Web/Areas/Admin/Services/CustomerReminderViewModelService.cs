@@ -25,7 +25,6 @@ namespace Grand.Web.Areas.Admin.Services
     public partial class CustomerReminderViewModelService : ICustomerReminderViewModelService
     {
         private readonly ICustomerService _customerService;
-        private readonly ICustomerTagService _customerTagService;
         private readonly ILocalizationService _localizationService;
         private readonly ICustomerActivityService _customerActivityService;
         private readonly ICustomerReminderService _customerReminderService;
@@ -36,7 +35,6 @@ namespace Grand.Web.Areas.Admin.Services
         #region Constructors
 
         public CustomerReminderViewModelService(ICustomerService customerService,
-            ICustomerTagService customerTagService,
             ILocalizationService localizationService,
             ICustomerActivityService customerActivityService,
             ICustomerReminderService customerReminderService,
@@ -45,7 +43,6 @@ namespace Grand.Web.Areas.Admin.Services
             IServiceProvider serviceProvider)
         {
             _customerService = customerService;
-            _customerTagService = customerTagService;
             _localizationService = localizationService;
             _customerActivityService = customerActivityService;
             _customerReminderService = customerReminderService;
@@ -487,7 +484,7 @@ namespace Grand.Web.Areas.Admin.Services
             model.AvailableCategories.Add(new SelectListItem { Text = _localizationService.GetResource("Admin.Common.All"), Value = " " });
             var categories = await categoryService.GetAllCategories(showHidden: true);
             foreach (var c in categories)
-                model.AvailableCategories.Add(new SelectListItem { Text = c.GetFormattedBreadCrumb(categories), Value = c.Id.ToString() });
+                model.AvailableCategories.Add(new SelectListItem { Text = categoryService.GetFormattedBreadCrumb(c, categories), Value = c.Id.ToString() });
 
             //manufacturers
             model.AvailableManufacturers.Add(new SelectListItem { Text = _localizationService.GetResource("Admin.Common.All"), Value = " " });
@@ -497,7 +494,7 @@ namespace Grand.Web.Areas.Admin.Services
             //stores
             model.AvailableStores.Add(new SelectListItem { Text = _localizationService.GetResource("Admin.Common.All"), Value = " " });
             foreach (var s in await storeService.GetAllStores())
-                model.AvailableStores.Add(new SelectListItem { Text = s.Name, Value = s.Id.ToString() });
+                model.AvailableStores.Add(new SelectListItem { Text = s.Shortcut, Value = s.Id.ToString() });
 
             //vendors
             model.AvailableVendors.Add(new SelectListItem { Text = _localizationService.GetResource("Admin.Common.All"), Value = " " });

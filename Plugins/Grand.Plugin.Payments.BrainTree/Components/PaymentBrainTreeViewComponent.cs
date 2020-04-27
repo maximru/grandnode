@@ -88,11 +88,11 @@ namespace Grand.Plugin.Payments.BrainTree.Components
             }
 
             //set postback values (we cannot access "Form" with "GET" requests)
-            if (Request.Method != WebRequestMethods.Http.Get)
+            if (Request.Method == WebRequestMethods.Http.Get)
                 return View("~/Plugins/Payments.BrainTree/Views/PaymentInfo.cshtml", model);
 
+            var form = await HttpContext.Request.ReadFormAsync();
 
-            var form = Request.Form;
             model.CardholderName = form["CardholderName"];
             model.CardNumber = form["CardNumber"];
             model.CardCode = form["CardCode"];

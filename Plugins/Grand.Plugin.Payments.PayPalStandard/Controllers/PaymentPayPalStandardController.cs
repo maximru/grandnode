@@ -9,6 +9,7 @@ using Grand.Services.Localization;
 using Grand.Services.Logging;
 using Grand.Services.Orders;
 using Grand.Services.Payments;
+using Grand.Services.Security;
 using Grand.Services.Stores;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +23,7 @@ using System.Threading.Tasks;
 
 namespace Grand.Plugin.Payments.PayPalStandard.Controllers
 {
-    
+
     public class PaymentPayPalStandardController : BasePaymentController
     {
         private readonly IWorkContext _workContext;
@@ -35,6 +36,7 @@ namespace Grand.Plugin.Payments.PayPalStandard.Controllers
         private readonly IStoreContext _storeContext;
         private readonly ILogger _logger;
         private readonly IWebHelper _webHelper;
+        private readonly IPermissionService _permissionService;
         private readonly PaymentSettings _paymentSettings;
 
         public PaymentPayPalStandardController(IWorkContext workContext,
@@ -47,6 +49,7 @@ namespace Grand.Plugin.Payments.PayPalStandard.Controllers
             IStoreContext storeContext,
             ILogger logger,
             IWebHelper webHelper,
+            IPermissionService permissionService,
             PaymentSettings paymentSettings)
         {
             _workContext = workContext;
@@ -59,6 +62,7 @@ namespace Grand.Plugin.Payments.PayPalStandard.Controllers
             _storeContext = storeContext;
             _logger = logger;
             _webHelper = webHelper;
+            _permissionService = permissionService;
             _paymentSettings = paymentSettings;
         }
 
@@ -66,6 +70,9 @@ namespace Grand.Plugin.Payments.PayPalStandard.Controllers
         [Area("Admin")]
         public async Task<IActionResult> Configure()
         {
+            if (!await _permissionService.Authorize(StandardPermissionProvider.ManagePaymentMethods))
+                return AccessDeniedView();
+
             //load settings for a chosen store scope
             var storeScope = await GetActiveStoreScopeConfiguration(_storeService, _workContext);
             var payPalStandardPaymentSettings = _settingService.LoadSetting<PayPalStandardPaymentSettings>(storeScope);
@@ -99,6 +106,9 @@ namespace Grand.Plugin.Payments.PayPalStandard.Controllers
         [Area("Admin")]
         public async Task<IActionResult> Configure(ConfigurationModel model)
         {
+            if (!await _permissionService.Authorize(StandardPermissionProvider.ManagePaymentMethods))
+                return AccessDeniedView();
+
             if (!ModelState.IsValid)
                 return await Configure();
 
@@ -234,8 +244,7 @@ namespace Grand.Plugin.Payments.PayPalStandard.Controllers
                     sb.AppendLine("New payment status: " + newPaymentStatus);
 
                     //order note
-                    await _orderService.InsertOrderNote(new OrderNote
-                    {
+                    await _orderService.InsertOrderNote(new OrderNote {
                         Note = sb.ToString(),
                         DisplayToCustomer = false,
                         CreatedOnUtc = DateTime.UtcNow,
@@ -247,14 +256,13 @@ namespace Grand.Plugin.Payments.PayPalStandard.Controllers
                     var payPalStandardPaymentSettings = _settingService.LoadSetting<PayPalStandardPaymentSettings>(storeScope);
 
                     //validate order total
-                    if (payPalStandardPaymentSettings.PdtValidateOrderTotal && !Math.Round(mc_gross, 2).Equals(Math.Round(order.OrderTotal, 2)))
+                    if (payPalStandardPaymentSettings.PdtValidateOrderTotal && !Math.Round(mc_gross, 2).Equals(Math.Round(order.OrderTotal * order.CurrencyRate, 2)))
                     {
-                        string errorStr = string.Format("PayPal PDT. Returned order total {0} doesn't equal order total {1}. Order# {2}.", mc_gross, order.OrderTotal, order.OrderNumber);
+                        string errorStr = string.Format("PayPal PDT. Returned order total {0} doesn't equal order total {1}. Order# {2}.", mc_gross, order.OrderTotal * order.CurrencyRate, order.OrderNumber);
                         _logger.Error(errorStr);
 
                         //order note
-                        await _orderService.InsertOrderNote(new OrderNote
-                        {
+                        await _orderService.InsertOrderNote(new OrderNote {
                             Note = errorStr,
                             OrderId = order.Id,
                             DisplayToCustomer = false,
@@ -292,8 +300,7 @@ namespace Grand.Plugin.Payments.PayPalStandard.Controllers
                 if (order != null)
                 {
                     //order note
-                    await _orderService.InsertOrderNote(new OrderNote
-                    {
+                    await _orderService.InsertOrderNote(new OrderNote {
                         Note = "PayPal PDT failed. " + response,
                         DisplayToCustomer = false,
                         CreatedOnUtc = DateTime.UtcNow,
@@ -396,8 +403,7 @@ namespace Grand.Plugin.Payments.PayPalStandard.Controllers
                                                 if (recurringPaymentHistory.Count == 0)
                                                 {
                                                     //first payment
-                                                    var rph = new RecurringPaymentHistory
-                                                    {
+                                                    var rph = new RecurringPaymentHistory {
                                                         RecurringPaymentId = rp.Id,
                                                         OrderId = initialOrder.Id,
                                                         CreatedOnUtc = DateTime.UtcNow
@@ -417,7 +423,7 @@ namespace Grand.Plugin.Payments.PayPalStandard.Controllers
 
                                 _logger.Information("PayPal IPN. Recurring info", new GrandException(sb.ToString()));
                             }
-                            else 
+                            else
                             {
                                 _logger.Error("PayPal IPN. Order is not found", new GrandException(sb.ToString()));
                             }
@@ -442,8 +448,7 @@ namespace Grand.Plugin.Payments.PayPalStandard.Controllers
                             if (order != null)
                             {
                                 //order note
-                                await _orderService.InsertOrderNote(new OrderNote
-                                {
+                                await _orderService.InsertOrderNote(new OrderNote {
                                     Note = sb.ToString(),
                                     DisplayToCustomer = false,
                                     CreatedOnUtc = DateTime.UtcNow,
@@ -459,7 +464,7 @@ namespace Grand.Plugin.Payments.PayPalStandard.Controllers
                                     case PaymentStatus.Authorized:
                                         {
                                             //validate order total
-                                            if (Math.Round(mc_gross, 2).Equals(Math.Round(order.OrderTotal, 2)))
+                                            if (Math.Round(mc_gross, 2).Equals(Math.Round(order.OrderTotal * order.CurrencyRate, 2)))
                                             {
                                                 //valid
                                                 if (_orderProcessingService.CanMarkOrderAsAuthorized(order))
@@ -470,12 +475,11 @@ namespace Grand.Plugin.Payments.PayPalStandard.Controllers
                                             else
                                             {
                                                 //not valid
-                                                string errorStr = string.Format("PayPal IPN. Returned order total {0} doesn't equal order total {1}. Order# {2}.", mc_gross, order.OrderTotal, order.Id);
+                                                string errorStr = string.Format("PayPal IPN. Returned order total {0} doesn't equal order total {1}. Order# {2}.", mc_gross, order.OrderTotal * order.CurrencyRate, order.Id);
                                                 //log
                                                 _logger.Error(errorStr);
                                                 //order note
-                                                await _orderService.InsertOrderNote(new OrderNote
-                                                {
+                                                await _orderService.InsertOrderNote(new OrderNote {
                                                     Note = errorStr,
                                                     DisplayToCustomer = false,
                                                     CreatedOnUtc = DateTime.UtcNow,
@@ -487,7 +491,7 @@ namespace Grand.Plugin.Payments.PayPalStandard.Controllers
                                     case PaymentStatus.Paid:
                                         {
                                             //validate order total
-                                            if (Math.Round(mc_gross, 2).Equals(Math.Round(order.OrderTotal, 2)))
+                                            if (Math.Round(mc_gross, 2).Equals(Math.Round(order.OrderTotal * order.CurrencyRate, 2)))
                                             {
                                                 //valid
                                                 if (await _orderProcessingService.CanMarkOrderAsPaid(order))
@@ -500,12 +504,11 @@ namespace Grand.Plugin.Payments.PayPalStandard.Controllers
                                             else
                                             {
                                                 //not valid
-                                                string errorStr = string.Format("PayPal IPN. Returned order total {0} doesn't equal order total {1}. Order# {2}.", mc_gross, order.OrderTotal, order.Id);
+                                                string errorStr = string.Format("PayPal IPN. Returned order total {0} doesn't equal order total {1}. Order# {2}.", mc_gross, order.OrderTotal * order.CurrencyRate, order.Id);
                                                 //log
                                                 _logger.Error(errorStr);
                                                 //order note
-                                                await _orderService.InsertOrderNote(new OrderNote
-                                                {
+                                                await _orderService.InsertOrderNote(new OrderNote {
                                                     Note = errorStr,
                                                     DisplayToCustomer = false,
                                                     CreatedOnUtc = DateTime.UtcNow,
@@ -517,7 +520,7 @@ namespace Grand.Plugin.Payments.PayPalStandard.Controllers
                                     case PaymentStatus.Refunded:
                                         {
                                             var totalToRefund = Math.Abs(mc_gross);
-                                            if (totalToRefund > 0 && Math.Round(totalToRefund, 2).Equals(Math.Round(order.OrderTotal, 2)))
+                                            if (totalToRefund > 0 && Math.Round(totalToRefund, 2).Equals(Math.Round(order.OrderTotal * order.CurrencyRate, 2)))
                                             {
                                                 //refund
                                                 if (_orderProcessingService.CanRefundOffline(order))
